@@ -82,7 +82,10 @@ df_imputed <- mutate(df_imputed,
        weekend = factor(ifelse(weekdays(date) %in% c('Sunday', 'Saturday'),
                                'Weekend', 'Weekday')))
 
-# use facet grid to display the mean step trends by interval by weekend/weekday:
+# use facet grid to display the mean step trends by interval by weekend/weekday,
+# it seems weekends have higher levels of activity across the entire day while
+# weekdays have a spike in the morning followed by fewer steps until the evening.
+# Also the subject wakes up later on the weekend and goes to bed later!:
 group_by(df_imputed, weekend, interval) %>%
     summarize(avg_steps = mean(steps)) %>%
     ggplot(aes(x=interval, y=avg_steps)) +
