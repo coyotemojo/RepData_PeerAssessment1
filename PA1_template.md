@@ -148,6 +148,38 @@ summary(df_imputed)
 ##  Max.   :806.0   Max.   :2012-11-30   Max.   :2355
 ```
 
+```r
+# histogram of the data with imputed values
+# now more days right at the mean/median bucket
+group_by(df_imputed, date) %>%
+    summarize(total_steps = sum(steps)) %>%
+    ggplot(aes(x=total_steps)) + 
+    geom_bar(binwidth=1000) +
+    scale_x_continuous(labels=comma, name='Total Steps') +
+    scale_y_continuous(name='Days', breaks=c(0:20)) + 
+    ggtitle('Frequency of Daily Total Steps')
+```
+
+![plot of chunk unnamed-chunk-5](./PA1_template_files/figure-html/unnamed-chunk-5.png) 
+
+```r
+# have the mean and the median changed?
+# almost not at all (the median increased by 1)
+group_by(df_imputed, date) %>%
+    summarize(total_steps = sum(steps)) %>%
+    summarize(mean_total_steps_per_day = mean(total_steps, na.rm=TRUE),
+              median_total_steps_per_day = median(total_steps, na.rm=TRUE)) %>%
+    knitr::kable()
+```
+
+```
+## 
+## 
+## | mean_total_steps_per_day| median_total_steps_per_day|
+## |------------------------:|--------------------------:|
+## |                    10766|                      10766|
+```
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -157,7 +189,10 @@ df_imputed <- mutate(df_imputed,
        weekend = factor(ifelse(weekdays(date) %in% c('Sunday', 'Saturday'),
                                'Weekend', 'Weekday')))
 
-# use facet grid to display the mean step trends by interval by weekend/weekday:
+# use facet grid to display the mean step trends by interval by weekend/weekday,
+# it seems weekends have higher levels of activity across the entire day while
+# weekdays have a spike in the morning followed by fewer steps until the evening.
+# Also the subject wakes up later on the weekend and goes to bed later!:
 group_by(df_imputed, weekend, interval) %>%
     summarize(avg_steps = mean(steps)) %>%
     ggplot(aes(x=interval, y=avg_steps)) +
